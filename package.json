@@ -1,0 +1,23 @@
+{
+  "name":               "node-gmp-ffi",
+  "version":            "1.0.0",
+  "description":        "node interface to the GNU Multiple Precision Arithmetic Library",
+  "author":             "pmuellr",
+  "main":               "index.js",
+  "scripts": {
+    "install":          "make gmp-lib"
+  },
+  "homepage":           "https://github.com/pmuellr/node-gmp-ffi",
+  "license":            "LGPL-3.0",
+  "repository": {
+    "type":             "git",
+    "url" :             "https://github.com/pmuellr/node-gmp-ffi.git"
+  },
+  "dependencies": {
+    "ffi":              "1.3.x",
+    "ref":              "1.0.x",
+    "ref-struct":       "1.0.x"
+  },
+  "devDependencies": {
+  }
+}
