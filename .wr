@@ -1,0 +1,8 @@
+# see: https://www.npmjs.com/package/wr
+
+--exec
+
+npm test
+
+index.js
+test

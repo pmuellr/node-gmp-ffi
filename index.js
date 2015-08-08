@@ -1,9 +1,21 @@
 // Licensed under the LGPL-v3 License. See footer for details.
 
+var os   = require("os")
+var path = require("path")
+
 var ffi       = require("ffi")
 var ref       = require("ref")
 var refStruct = require("ref-struct")
 
+var debug = require("debug")
+var D     = debug("gmp")
+
+//------------------------------------------------------------------------------
+function setExports() {
+  exports.mpz = mpz
+}
+
+//------------------------------------------------------------------------------
 var mpz_t   = refStruct({
   _mp_alloc: "int",
   _mp_size:  "int",
@@ -12,15 +24,27 @@ var mpz_t   = refStruct({
 
 var mpz_ptr = ref.refType(mpz_t)
 
-var libgmp = ffi.Library("libgmp", {
-  "__gmpz_init":    [ "void",  [ mpz_ptr ] ],
-  "__gmpz_clear":   [ "void",  [ mpz_ptr ] ],
-  "__gmpz_add":     [ "void",  [ mpz_ptr, mpz_ptr, mpz_ptr ] ],
-  "__gmpz_get_ui":  [ "ulong", [ mpz_ptr ] ],
-  "__gmpz_get_si":  [ "long",  [ mpz_ptr ] ],
-  "__gmpz_set_ui":  [ "void",  [ mpz_ptr, "ulong" ] ],
-  "__gmpz_set_si":  [ "void",  [ mpz_ptr, "long" ] ],
+//------------------------------------------------------------------------------
+var platArch  = os.platform() + "-" + os.arch()
+var sharedLib = path.join("shared-lib", platArch, "libgmp")
+
+var libgmp = ffi.Library(sharedLib, {
+  "__gmpz_init":       [ "void",    [ mpz_ptr ] ],
+  "__gmpz_clear":      [ "void",    [ mpz_ptr ] ],
+  "__gmpz_add":        [ "void",    [ mpz_ptr, mpz_ptr, mpz_ptr ] ],
+  "__gmpz_sub":        [ "void",    [ mpz_ptr, mpz_ptr, mpz_ptr ] ],
+  "__gmpz_mul":        [ "void",    [ mpz_ptr, mpz_ptr, mpz_ptr ] ],
+  "__gmpz_get_ui":     [ "ulong",   [ mpz_ptr ] ],
+  "__gmpz_get_si":     [ "long",    [ mpz_ptr ] ],
+  "__gmpz_set_ui":     [ "void",    [ mpz_ptr, "ulong" ] ],
+  "__gmpz_set_si":     [ "void",    [ mpz_ptr, "long" ] ],
+  "__gmpz_get_str":    [ "string",  [ "pointer", "int", mpz_ptr ] ],
+  "__gmpz_sizeinbase": [ "size_t",  [ mpz_ptr, "int"  ] ],
 })
+
+for (var key in libgmp) {
+  if (key.match(/^__gmpz_/)) libgmp[key.slice(3)] = libgmp[key]
+}
 
 //------------------------------------------------------------------------------
 function mpz(init) {
@@ -48,34 +72,34 @@ mpz.from_si = function mpz_from_si(si) {
 
 //------------------------------------------------------------------------------
 mpz.prototype.init = function mpz_init() {
-  libgmp.__gmpz_init(this.mpzPtr)
+  libgmp.mpz_init(this.mpzPtr)
   return this
 }
 
 //------------------------------------------------------------------------------
 mpz.prototype.clear = function mpz_clear() {
-  libgmp.__gmpz_clear(this.mpzPtr)
+  libgmp.mpz_clear(this.mpzPtr)
 }
 
 //------------------------------------------------------------------------------
 mpz.prototype.get_ui = function mpz_get_ui() {
-  return libgmp.__gmpz_get_ui(this.mpzPtr)
+  return libgmp.mpz_get_ui(this.mpzPtr)
 }
 
 //------------------------------------------------------------------------------
 mpz.prototype.get_si = function mpz_get_si() {
-  return libgmp.__gmpz_get_si(this.mpzPtr)
+  return libgmp.mpz_get_si(this.mpzPtr)
 }
 
 //------------------------------------------------------------------------------
 mpz.prototype.set_ui = function mpz_set_ui(ulong) {
-  libgmp.__gmpz_set_ui(this.mpzPtr, ulong)
+  libgmp.mpz_set_ui(this.mpzPtr, ulong)
   return this
 }
 
 //------------------------------------------------------------------------------
 mpz.prototype.set_si = function mpz_set_si(long) {
-  libgmp.__gmpz_set_si(this.mpzPtr, long)
+  libgmp.mpz_set_si(this.mpzPtr, long)
   return this
 }
 
@@ -83,53 +107,40 @@ mpz.prototype.set_si = function mpz_set_si(long) {
 mpz.prototype.add = function mpz_add(mpzOther, mpzResult) {
   if (!mpzResult) mpzResult = new mpz()
 
-  libgmp.__gmpz_add(mpzResult.mpzPtr, this.mpzPtr, mpzOther.mpzPtr)
+  libgmp.mpz_add(mpzResult.mpzPtr, this.mpzPtr, mpzOther.mpzPtr)
 
   return mpzResult
 }
 
 //------------------------------------------------------------------------------
-function basic_test() {
-  var num1 = mpz(1)
-  var num2 = mpz(2)
-  var num3 = mpz()
+mpz.prototype.mul = function mpz_mul(mpzOther, mpzResult) {
+  if (!mpzResult) mpzResult = new mpz()
 
-  num1.add(num2, num3)
+  libgmp.mpz_mul(mpzResult.mpzPtr, this.mpzPtr, mpzOther.mpzPtr)
 
-  var val = num3.get_ui()
-
-  console.log("1 + 2 =", val)
-
-  num1.clear()
-  num2.clear()
-  num3.clear()
+  return mpzResult
 }
 
 //------------------------------------------------------------------------------
-function basic_basic_test() {
-  var num1 = ref.alloc(mpz_t)
-  var num2 = ref.alloc(mpz_t)
-  var num3 = ref.alloc(mpz_t)
+mpz.prototype.toString = function mpz_toString(base) {
+  D("mpz::toString " + this.get_ui())
 
-  libgmp.__gmpz_init(num1)
-  libgmp.__gmpz_init(num2)
-  libgmp.__gmpz_init(num3)
+  if (!base) base = 10
+  D("   base: " + base)
 
-  libgmp.__gmpz_set_ui(num1, 1)
-  libgmp.__gmpz_set_ui(num2, 2)
+  var size = 2 + libgmp.mpz_sizeinbase(this.mpzPtr, base)
+  D("   size: " + size)
 
-  libgmp.__gmpz_add(num3, num1, num2)
+  var buf = new Buffer(size)
 
-  var val = libgmp.__gmpz_get_ui(num3)
+  var result = libgmp.mpz_get_str(buf, base, this.mpzPtr)
+  D("   buff: 0x" + buf.toString("hex"))
 
-  console.log("1 + 2 =", val)
-
-  libgmp.__gmpz_clear(num1)
-  libgmp.__gmpz_clear(num2)
-  libgmp.__gmpz_clear(num3)
+  return result
 }
 
-if (require.main == module) basic_test()
+//------------------------------------------------------------------------------
+setExports()
 
 //------------------------------------------------------------------------------
 // Licensed under the GNU Lesser General Public License, Version 3

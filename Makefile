@@ -13,14 +13,8 @@ GMP_DIR          = gmp-$(GMP_VERSION)
 help:
 		@echo "targets for Make:"
 		@echo ""
-		@echo "gmp-lib - compiles the gmp source"
-		@echo "gmp-src - gets the gmp source"
-
-#-------------------------------------------------------------------------------
-gmp-lib:
-		cd gmp-$(GMP_VERSION); ./configure; make
-		cp gmp-$(GMP_VERSION)/.libs/libgmp.dylib .
-		cd gmp-$(GMP_VERSION); make clean
+		@echo "gmp-src    - gets the gmp source"
+		@echo "darwin-x64 - builds the darwin x64 version of the shared library"
 
 #-------------------------------------------------------------------------------
 gmp-src:
@@ -29,6 +23,12 @@ gmp-src:
 		tar xf gmp-$(GMP_VERSION_FULL).tar
 		rm gmp-$(GMP_VERSION_FULL).tar
 		rm gmp-$(GMP_VERSION_FULL).tar.xz
+
+#-------------------------------------------------------------------------------
+darwin-x64:
+		cd gmp-$(GMP_VERSION); ./configure; make
+		cp gmp-$(GMP_VERSION)/.libs/libgmp.dylib shared-lib/darwin-x64
+		cd gmp-$(GMP_VERSION); make clean
 
 #-------------------------------------------------------------------------------
 # Licensed under the GNU Lesser General Public License, Version 3
