@@ -5,7 +5,6 @@
   "author":             "pmuellr",
   "main":               "index.js",
   "scripts": {
-    "install":          "make gmp-lib",
     "test":             "DEBUG=curr tape test/*.js | tap-spec"
   },
   "homepage":           "https://github.com/pmuellr/node-gmp-ffi",
