@@ -5,7 +5,7 @@ var gmp = require("..")
 var test = require('tape')
 
 //------------------------------------------------------------------------------
-test("new", function(t) {
+test("Integer create", function(t) {
   var obj
   var arg
 
@@ -34,6 +34,171 @@ test("new", function(t) {
   t.equal(obj.toString(), "42", "test Float number arg")
   obj.dispose()
   arg.dispose()
+
+  arg = "42"
+  obj = gmp.Integer(arg)
+  t.equal(obj.toString(), "42", "test string number arg")
+  obj.dispose()
+
+  t.end()
+})
+
+//------------------------------------------------------------------------------
+test("Integer add", function(t) {
+  var obj
+  var arg
+  var result
+
+  obj = gmp.Integer(40)
+  arg = 2
+  result = obj.add(arg)
+  t.equal(result.toString(), "42", "test JS number arg")
+  obj.dispose()
+  result.dispose()
+
+  obj = gmp.Integer(40)
+  arg = gmp.Integer(2)
+  result = obj.add(arg)
+  t.equal(result.toString(), "42", "test Integer arg")
+  obj.dispose()
+  arg.dispose()
+  result.dispose()
+
+  obj = gmp.Integer(40)
+  arg = gmp.Rational(2)
+  result = obj.add(arg)
+  t.equal(result.toString(), "42", "test Rational arg")
+  obj.dispose()
+  arg.dispose()
+  result.dispose()
+
+  obj = gmp.Integer(40)
+  arg = gmp.Float(2)
+  result = obj.add(arg)
+  t.equal(result.toString(), "42", "test Float arg")
+  obj.dispose()
+  arg.dispose()
+  result.dispose()
+
+  t.end()
+})
+
+//------------------------------------------------------------------------------
+test("Integer sub", function(t) {
+  var obj
+  var arg
+  var result
+
+  obj = gmp.Integer(44)
+  arg = 2
+  result = obj.sub(arg)
+  t.equal(result.toString(), "42", "test JS number arg")
+  obj.dispose()
+  result.dispose()
+
+  obj = gmp.Integer(44)
+  arg = gmp.Integer(2)
+  result = obj.sub(arg)
+  t.equal(result.toString(), "42", "test Integer arg")
+  obj.dispose()
+  arg.dispose()
+  result.dispose()
+
+  obj = gmp.Integer(44)
+  arg = gmp.Rational(2)
+  result = obj.sub(arg)
+  t.equal(result.toString(), "42", "test Rational arg")
+  obj.dispose()
+  arg.dispose()
+  result.dispose()
+
+  obj = gmp.Integer(44)
+  arg = gmp.Float(2)
+  result = obj.sub(arg)
+  t.equal(result.toString(), "42", "test Float arg")
+  obj.dispose()
+  arg.dispose()
+  result.dispose()
+
+  t.end()
+})
+
+//------------------------------------------------------------------------------
+test("Integer mul", function(t) {
+  var obj
+  var arg
+  var result
+
+  obj = gmp.Integer(21)
+  arg = 2
+  result = obj.mul(arg)
+  t.equal(result.toString(), "42", "test JS number arg")
+  obj.dispose()
+  result.dispose()
+
+  obj = gmp.Integer(21)
+  arg = gmp.Integer(2)
+  result = obj.mul(arg)
+  t.equal(result.toString(), "42", "test Integer arg")
+  obj.dispose()
+  arg.dispose()
+  result.dispose()
+
+  obj = gmp.Integer(21)
+  arg = gmp.Rational(2)
+  result = obj.mul(arg)
+  t.equal(result.toString(), "42", "test Rational arg")
+  obj.dispose()
+  arg.dispose()
+  result.dispose()
+
+  obj = gmp.Integer(21)
+  arg = gmp.Float(2)
+  result = obj.mul(arg)
+  t.equal(result.toString(), "42", "test Float arg")
+  obj.dispose()
+  arg.dispose()
+  result.dispose()
+
+  t.end()
+})
+
+//------------------------------------------------------------------------------
+test("Integer div", function(t) {
+  var obj
+  var arg
+  var result
+
+  obj = gmp.Integer(84)
+  arg = 2
+  result = obj.div(arg)
+  t.equal(result.toString(), "42", "test JS number arg")
+  obj.dispose()
+  result.dispose()
+
+  obj = gmp.Integer(84)
+  arg = gmp.Integer(2)
+  result = obj.div(arg)
+  t.equal(result.toString(), "42", "test Integer arg")
+  obj.dispose()
+  arg.dispose()
+  result.dispose()
+
+  obj = gmp.Integer(84)
+  arg = gmp.Rational(2)
+  result = obj.div(arg)
+  t.equal(result.toString(), "42", "test Rational arg")
+  obj.dispose()
+  arg.dispose()
+  result.dispose()
+
+  obj = gmp.Integer(84)
+  arg = gmp.Float(2)
+  result = obj.div(arg)
+  t.equal(result.toString(), "42", "test Float arg")
+  obj.dispose()
+  arg.dispose()
+  result.dispose()
 
   t.end()
 })
