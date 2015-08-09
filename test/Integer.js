@@ -5,43 +5,35 @@ var gmp = require("..")
 var test = require('tape')
 
 //------------------------------------------------------------------------------
-test("add", function(t) {
-  var num1 = gmp.mpz(1)
-  var num2 = gmp.mpz(2)
-  var num3 = gmp.mpz()
+test("new", function(t) {
+  var obj
+  var arg
 
-  num1.add(num2, num3)
+  obj = gmp.Integer()
+  t.equal(obj.toString(), "0", "test no arg")
+  obj.dispose()
 
-  var numr = num1.add(num2)
+  obj = gmp.Integer(42)
+  t.equal(obj.toString(), "42", "test JS number arg")
+  obj.dispose()
 
-  t.equal(num3.get_ui(), 3)
-  t.equal(numr.get_ui(), 3)
+  arg = gmp.Integer(42)
+  obj = gmp.Integer(arg)
+  t.equal(obj.toString(), "42", "test Integer number arg")
+  obj.dispose()
+  arg.dispose()
 
-  num1.clear()
-  num2.clear()
-  num3.clear()
-  numr.clear()
+  arg = gmp.Rational(42)
+  obj = gmp.Integer(arg)
+  t.equal(obj.toString(), "42", "test Rational number arg")
+  obj.dispose()
+  arg.dispose()
 
-  t.end()
-})
-
-//------------------------------------------------------------------------------
-test("mul", function(t) {
-  var num2 = gmp.mpz(2)
-  var num3 = gmp.mpz(3)
-  var num6 = gmp.mpz()
-
-  num2.mul(num3, num6)
-
-  var numr = num2.mul(num3)
-
-  t.equal(num6.get_ui(), 6)
-  t.equal(numr.get_ui(), 6)
-
-  num2.clear()
-  num3.clear()
-  num6.clear()
-  numr.clear()
+  arg = gmp.Float(42)
+  obj = gmp.Integer(arg)
+  t.equal(obj.toString(), "42", "test Float number arg")
+  obj.dispose()
+  arg.dispose()
 
   t.end()
 })
@@ -52,7 +44,7 @@ test("factorial test", function(t){
   var fact100  = factorial(100)
   var actual   = fact100.toString()
 
-  fact100.clear()
+  fact100.dispose()
 
   t.equal(actual, expected)
   t.end()
@@ -60,15 +52,20 @@ test("factorial test", function(t){
 
 //------------------------------------------------------------------------------
 function factorial(n) {
-  var result = gmp.mpz(1)
-  var impz   = gmp.mpz()
+  var result = gmp.Integer(1)
+  var tmp
+  var iNum
 
   for (var i=2; i<=n; i++) {
-    impz.set_ui(i)
-    result.mul(impz, result)
-  }
+    iNum = gmp.Integer(i)
 
-  impz.clear()
+    tmp = result.mul(iNum)
+
+    iNum.dispose()
+    result.dispose()
+
+    result = tmp
+  }
 
   return result
 }

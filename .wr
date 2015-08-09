@@ -5,4 +5,5 @@
 npm test
 
 index.js
+lib
 test
